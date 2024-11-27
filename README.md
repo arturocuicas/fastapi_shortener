@@ -1,4 +1,4 @@
-# fastapi_shortener
+# Shortener with FastAPI 
 
 ## Description
 
@@ -15,18 +15,53 @@
 
 1. Clone the repository:
     ```bash
-    git clone <REPOSITORY_URL>
+    git clone https://github.com/arturocuicas/fastapi_shortener.git
     cd fastapi_shortener
     ```
 
-2. 
+2. Run docker-compose to build the application:
+    ```bash
+    docker-compose up --build
+    ```
 
-2. Access the interactive API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+3. Access the interactive API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
 ## Endpoints
 
-- **GET /**: Root endpoint that returns a greeting message.
-- **GET /{hash_key}**: Redirects to the original URL associated with the `hash_key`.
+- **GET /api/links/**: Returns a list of all shortened URLs.
+- **POST /api/links/**: Shortens a URL and returns the shortened URL.
+    - **Request Body**:
+        ```json
+        {
+            "url": "https://www.example.com"
+        }
+        ```
+    - **Response**:
+        ```json
+        {
+           "url": "https://example.com/",
+           "id": "string",
+           "hash_key": "string"
+         }
+        ```
+- **GET /api/links/{id}**: Returns the original URL associated with the `id`.
+- **PUT /api/links/{id}**: Updates the shortened URL associated with the `id`.
+    - **Request Body**:
+        ```json
+        {
+            "url": "https://www.example.com"
+        }
+        ```
+    - **Response**:
+        ```json
+        {
+           "url": "https://example.com/",
+           "id": "string",
+           "hash_key": "string"
+         }
+        ```
+- **DELETE /api/links/{id}**: Deletes the shortened URL associated with the `id`.
+- **GET /api/s/{hash_key}**: Redirects to the original URL associated with the `hash_key`.
 
 ## Configuration
 
