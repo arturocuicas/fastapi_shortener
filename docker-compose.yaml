@@ -1,22 +1,22 @@
 version: '3.8'
 
 services:
-#  api:
-#    build:
-#      context: ./app
-#      dockerfile: Dockerfile
-#    hostname: api
-#    container_name: api
-#    depends_on:
-#      - mongo
-#    ports:
-#      - "8000:8000"
-#    env_file:
-#      - app/.env
-#    volumes:
-#      - ./app:/home/app
-#    networks:
-#      - short-net
+  api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    hostname: api
+    container_name: api
+    depends_on:
+      - mongo
+    ports:
+      - "8000:8000"
+    env_file:
+      - app/.env
+    volumes:
+      - ./app:/home/app
+    networks:
+      - short-net
 
   mongo:
     image: mongo:latest
