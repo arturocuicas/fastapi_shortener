@@ -17,5 +17,8 @@ class GlobalConfig(BaseConfig):
     api_prefix: str = "/api"
     hash_length: int = int(os.environ.get("HASH_LENGTH"))
     mongo_connection: str = os.environ.get("MONGO_CONNECTION")
+    redis_server: str = os.environ.get("REDIS_SERVER")
+    redis_port: int = int(os.environ.get("REDIS_PORT"))
+
 
 settings = GlobalConfig()

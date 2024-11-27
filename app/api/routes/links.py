@@ -1,8 +1,9 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.dependencies.collections import get_repository
+from api.dependencies.redis import cache
 from db.repositories.links import LinkRepository
 from schemas.links import LinkCreate, LinkRead, LinkUpdate
 
@@ -17,7 +18,7 @@ router = APIRouter()
 )
 async def create_link(
     link_create: LinkCreate,
-    link_repository = Depends(get_repository(LinkRepository)),
+    link_repository=Depends(get_repository(LinkRepository)),
 ) -> LinkRead:
     new_link = await link_repository.create_link(link_create)
 
@@ -35,7 +36,7 @@ async def create_link(
     name="Links",
 )
 async def get_links(
-    link_repository = Depends(get_repository(LinkRepository)),
+    link_repository=Depends(get_repository(LinkRepository)),
 ) -> List[LinkRead]:
 
     return [
@@ -47,6 +48,7 @@ async def get_links(
         for link in await link_repository.get_links()
     ]
 
+
 @router.get(
     "/{id}",
     status_code=status.HTTP_200_OK,
@@ -55,18 +57,21 @@ async def get_links(
 )
 async def get_link(
     id: str,
-    link_repository = Depends(get_repository(LinkRepository)),
+    link_repository=Depends(get_repository(LinkRepository)),
 ) -> LinkRead:
     link = await link_repository.get_link(id)
 
     if not link:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
+        )
 
     return LinkRead(
         id=str(link["_id"]),
         url=link["url"],
         hash_key=link["hash_key"],
     )
+
 
 @router.put(
     "/{id}",
@@ -77,18 +82,24 @@ async def get_link(
 async def update_link(
     id: str,
     link_update: LinkUpdate,
-    link_repository = Depends(get_repository(LinkRepository)),
+    redis_client: cache = Depends(cache),
+    link_repository=Depends(get_repository(LinkRepository)),
 ) -> LinkRead:
     link = await link_repository.update_link(id, link_update)
 
     if not link:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
+        )
+
+    redis_client.delete(link["hash_key"])
 
     return LinkRead(
         id=str(link["_id"]),
         url=link["url"],
         hash_key=link["hash_key"],
     )
+
 
 @router.delete(
     "/{id}",
@@ -98,11 +109,14 @@ async def update_link(
 )
 async def delete_link(
     id: str,
-    link_repository = Depends(get_repository(LinkRepository)),
+    redis_client: cache = Depends(cache),
+    link_repository=Depends(get_repository(LinkRepository)),
 ):
     link = await link_repository.delete_link(id)
 
     if not link:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
+        )
 
-    return None
+    redis_client.delete(link["hash_key"])

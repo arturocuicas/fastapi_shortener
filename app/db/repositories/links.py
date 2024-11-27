@@ -14,11 +14,7 @@ class LinkRepository:
         return await self.session["links"].find_one({"_id": id})
 
     async def get_links(self) -> List[Optional[Dict]]:
-        return [
-            link
-            async for link
-            in self.session["links"].find()
-        ]
+        return [link async for link in self.session["links"].find()]
 
     async def create_link(self, link_create: LinkCreate) -> Dict:
         link = await self.session["links"].insert_one(
@@ -41,10 +37,12 @@ class LinkRepository:
 
         await self.session["links"].update_one(
             {"_id": ObjectId(id)},
-            {"$set": {
-                "url": str(link_update.url),
-                "hash_key": generate_hash_url(str(link_update.url))
-            }},
+            {
+                "$set": {
+                    "url": str(link_update.url),
+                    "hash_key": generate_hash_url(str(link_update.url)),
+                }
+            },
         )
 
         return await self._get_link(ObjectId(id))
