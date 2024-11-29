@@ -19,9 +19,9 @@
     cd fastapi_shortener
     ```
 
-2. Run docker-compose to build the application:
+2. Run docker compose to build the application:
     ```bash
-    docker-compose up --build
+    docker compose up -d
     ```
 
 3. Access the interactive API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
@@ -62,6 +62,11 @@
         ```
 - **DELETE /api/links/{id}**: Deletes the shortened URL associated with the `id`.
 - **GET /api/s/{hash_key}**: Redirects to the original URL associated with the `hash_key`.
+
+4. Stop the application:
+    ```bash
+    docker compose down
+    ```
 
 ## Configuration
 
